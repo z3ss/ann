@@ -2,12 +2,17 @@
 #include <functional>
 
 template <class T> class hash_family {
+	private:
+		std::function<uint32_t(T)> hash_function;
 	public:
-		uint64_t hash(T elem);
+		uint32_t hash(T elem);
+		hash_family(std::function<uint32_t(T)> hfunc) {
+			hash_function = hfunc;
+		}
 };
 
 template<class T>
-inline uint64_t hash_family<T>::hash(T elem)
+inline uint32_t hash_family<T>::hash(T elem)
 {
-	return uint64_t();
+	return hash_function(elem);
 }
