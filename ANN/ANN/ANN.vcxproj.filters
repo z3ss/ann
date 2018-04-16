@@ -18,15 +18,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ann.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ann.h">
+    <ClInclude Include="hash_family.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hash_family.h">
+    <ClInclude Include="ann.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
