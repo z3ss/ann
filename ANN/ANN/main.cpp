@@ -3,50 +3,82 @@
 #include <string>
 #include <bitset>
 #include <random>
+#include <vector>
 
 #include "hash_family.h"
+#include "bitset_hash.h"
+#include "ann.h"
 
 using namespace std;
 
-#define M 4
+#define M 128
+#define K 16
+#define L 20
 #define N 1000
+
+int dist(bitset<M> a, bitset<M> b)
+{
+	auto dif = a ^ b;
+	return dif.count();
+}
+
+vector<bitset_hash> create_bitset_hash()
+{
+	random_device seeder;
+	//then make a mersenne twister engine
+	mt19937 engine(seeder());
+	//then the easy part... the distribution
+	const uniform_int_distribution<int> rand_dist(0, M-1);
+
+	vector<bitset_hash> hfs;
+
+	for(size_t i = 0; i < L; i++)
+	{
+		vector<int> bits;
+
+		for (size_t j = 0; j < K; j++)
+		{
+			const auto bit = rand_dist(engine);
+			bits.push_back(bit);
+		}
+
+		bitset_hash bh(bits);
+		
+		hfs.push_back(bh);
+	}
+
+	return hfs;
+}
 
 int main(int argc, char** argv) {
 
-	/*ifstream infile("thefile.txt");
-	bitset<M> es[N];
+	cout << "loading file... ";
+
+	ifstream infile("nytimes.hamming.128.data");
+	vector<bitset<M>> es;
 
 	string line;
-	int i = 0;
 	while (getline(infile, line))
 	{
 		bitset<M> e(line);
-		es[i++] = e;
-	}*/
+		es.push_back(e);
+	}
 
-	//random_device seeder;
-	////then make a mersenne twister engine
-	//mt19937 engine(seeder());
-	////then the easy part... the distribution
-	//uniform_int_distribution<int> dist(0, 10);
-	////then just generate the integer like this:
-	//int one = dist(engine);
-	//int two = dist(engine);
+	cout << es.size() << " elements loaded\n";
 
-	//cout << "first " << one << "second " << two;
+	const auto hfs = create_bitset_hash();
 
-	hash_family<bitset<M>> hf([](bitset<M>) { return 32; });
+	ann<bitset<M>,bitset_hash> alg(hfs, dist);
 
-	bitset<M> a("0101");
-	bitset<M> b("0101");
+	alg.init(es);
 
-	auto c = a ^ b;
+	cout << "query: 00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011 \n";
 
-	cout << c.count() << "\n";
+	bitset<M> q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
 
-	uint32_t res = hf.hash(a);
+	auto res = alg.query(q);
 
-	cout << res;
+	cout << "found: " << res.to_string();
 
 	return 0;
 }
