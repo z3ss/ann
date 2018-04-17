@@ -37,9 +37,14 @@ int main(int argc, char** argv) {
 
 	hash_family<bitset<M>> hf([](bitset<M>) { return 32; });
 
-	bitset<M> bs("0101");
+	bitset<M> a("0101");
+	bitset<M> b("0101");
 
-	uint32_t res = hf.hash(bs);
+	auto c = a ^ b;
+
+	cout << c.count() << "\n";
+
+	uint32_t res = hf.hash(a);
 
 	cout << res;
 

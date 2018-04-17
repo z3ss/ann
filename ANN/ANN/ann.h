@@ -2,6 +2,7 @@
 #include <unordered_set>
 #include <map>
 #include <vector>
+#include <functional>
 
 #include "hash_family.h"
 
@@ -11,12 +12,14 @@ template <class T> class ann {
 	private:
 		vector<hash_family<T>> hfs;
 		vector<map<uint32_t, vector<T>>> buckets;
+		function<int(T, T)> dist;
 	public:
 		T query(T elem);
 		void init(vector<T> ps);
 
-		ann(vector<hash_family<T>> hash_family) {
+		ann(vector<hash_family<T>> hash_family, function<int(T, T)> distance) {
 			hfs = hash_family;
+			dist = distance;
 		}
 };
 
@@ -37,10 +40,15 @@ T ann<T>::query(T elem)
 
 	for (auto neighbor : neighbors)
 	{
-		
+		auto d = dist(neighbor, elem);
+		if(d < dis)
+		{
+			nearest = neighbor;
+			dis = d;
+		}
 	}
 
-	return elem;
+	return nearest;
 }
 
 template<class T>
