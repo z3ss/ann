@@ -5,20 +5,19 @@
 #include <random>
 #include <vector>
 
-#include "hash_family.h"
 #include "bitset_hash.h"
 #include "ann.h"
 
 using namespace std;
 
 #define M 128
-#define K 16
-#define L 20
+#define K 24
+#define L 25
 #define N 1000
 
-int dist(bitset<M> a, bitset<M> b)
+int dist(bitset<M>* a, bitset<M>* b)
 {
-	auto dif = a ^ b;
+	auto dif = *a ^ *b;
 	return dif.count();
 }
 
@@ -70,15 +69,17 @@ int main(int argc, char** argv) {
 
 	ann<bitset<M>,bitset_hash> alg(hfs, dist);
 
-	alg.init(es);
+	alg.init(&es);
 
 	cout << "query: 00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011 \n";
 
 	bitset<M> q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
 
-	auto res = alg.query(q);
+	auto res = alg.query(&q);
 
-	cout << "found: " << res.to_string();
+	cout << "found: " << res->to_string();
+
+	cout << "distance: " << (q^*res).count();
 
 	return 0;
 }
