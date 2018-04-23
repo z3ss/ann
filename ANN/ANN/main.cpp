@@ -5,7 +5,6 @@
 #include <random>
 #include <vector>
 
-#include "hash_family.h"
 #include "bitset_hash.h"
 #include "ann.h"
 
@@ -60,17 +59,16 @@ int main(int argc, char** argv) {
 	string line;
 	while (getline(infile, line))
 	{
-		bitset<M> e(line);
-		es.push_back(e);
+		es.emplace_back(line);
 	}
 
 	cout << es.size() << " elements loaded\n";
 
-	const auto hfs = create_bitset_hash();
+	auto hfs = create_bitset_hash();
 
-	ann<bitset<M>,bitset_hash> alg(hfs, dist);
+	ann<bitset<M>,bitset_hash> alg(&hfs, dist, L);
 
-	alg.init(es);
+	alg.init(&es);
 
 	cout << "query: 00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011 \n";
 
@@ -78,7 +76,9 @@ int main(int argc, char** argv) {
 
 	auto res = alg.query(q);
 
-	cout << "found: " << res.to_string();
+	cout << "found: " << res.to_string() << "\n";
+
+	cout << "distance: " << dist(q, res);
 
 	return 0;
 }

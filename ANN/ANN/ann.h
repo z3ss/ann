@@ -1,6 +1,5 @@
 #pragma once
-#include <unordered_set>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <functional>
 
@@ -9,15 +8,16 @@ using namespace std;
 template <class T, class S> class ann {
 	private:
 		vector<S> hfs;
-		vector<map<uint32_t, vector<T>>> buckets;
+		vector<unordered_map<uint32_t, vector<T>>> buckets;
 		function<int(T, T)> dist;
 	public:
 		T query(T elem);
-		void init(vector<T>& ps);
+		void init(vector<T>* ps);
 
-		ann(vector<S> hash_family, function<int(T, T)> distance) {
-			hfs = hash_family;
+		ann(vector<S>* hash_family, function<int(T, T)> distance, int l) {
+			hfs = *hash_family;
 			dist = distance;
+			buckets = vector<unordered_map<uint32_t, vector<T>>>(l);
 		}
 };
 
@@ -51,32 +51,30 @@ T ann<T,S>::query(T elem)
 }
 
 template<class T, class S>
-void ann<T,S>::init(vector<T>& ps)
+void ann<T,S>::init(vector<T>* ps)
 {
-	vector<map<uint32_t, vector<T>>> maps;
-	auto count = 0;
-	for (S hf : hfs)
+	auto count = 1;
+	vector<T>& pst = *ps;
+	for (size_t i = 0; i < hfs.size(); ++i)
 	{
-		cout << "Hash tables made: " << count++ << "\n";
-		map<uint32_t, vector<T>> m;
+		//map<uint32_t, vector<T>> m;
 
-		for (T p : ps)
+		for (size_t j = 0; j < pst.size(); ++j)
 		{
-			uint32_t hash = hf.hash(p);
+			uint32_t hash = hfs[i].hash(pst[j]);
 
-			if(m.count(hash) == 0)
+			if (buckets[i].count(hash) == 0)
 			{
-				vector<T> v = { p };
-				m.insert(make_pair(hash, v));
+				buckets[i].insert(make_pair(hash, vector<T>{ pst[j] }));
 			}
 			else
 			{
-				m[hash].push_back(p);
+				buckets[i][hash].push_back(pst[j]);
 			}
 		}
 
-		maps.push_back(m);
-	}
+		//buckets.push_back(m);
 
-	buckets = maps;
+		cout << "Hash tables made: " << count++ << "\n";
+	}
 }
