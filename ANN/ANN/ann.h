@@ -8,7 +8,7 @@ using namespace std;
 template <class T, class S> class ann {
 	private:
 		vector<S> hfs;
-		vector<unordered_map<uint32_t, vector<T>>> buckets;
+		vector<unordered_map<uint32_t, vector<T*>>> buckets;
 		function<int(T, T)> dist;
 	public:
 		T query(T elem);
@@ -17,21 +17,21 @@ template <class T, class S> class ann {
 		ann(vector<S>* hash_family, function<int(T, T)> distance, int l) {
 			hfs = *hash_family;
 			dist = distance;
-			buckets = vector<unordered_map<uint32_t, vector<T>>>(l);
+			buckets = vector<unordered_map<uint32_t, vector<T*>>>(l);
 		}
 };
 
 template<class T, class S>
 T ann<T,S>::query(T elem)
 {
-	vector<T> neighbors;
+	vector<T*> neighbors;
 
 	for (size_t i = 0; i < hfs.size(); i++)
 	{
 		uint32_t hash = hfs[i].hash(elem);
-		vector<T> nbs = buckets[i][hash];
+		//vector<T*> nbs = buckets[i][hash];
 
-		neighbors.insert(neighbors.end(), nbs.begin(), nbs.end());
+		neighbors.insert(neighbors.end(), buckets[i][hash].begin(), buckets[i][hash].end());
 	}
 
 	T nearest;
@@ -39,10 +39,11 @@ T ann<T,S>::query(T elem)
 
 	for (auto neighbor : neighbors)
 	{
-		auto d = dist(neighbor, elem);
+		T n = *neighbor;
+		auto d = dist(n, elem);
 		if(d < dis)
 		{
-			nearest = neighbor;
+			nearest = n;
 			dis = d;
 		}
 	}
@@ -57,24 +58,19 @@ void ann<T,S>::init(vector<T>* ps)
 	vector<T>& pst = *ps;
 	for (size_t i = 0; i < hfs.size(); ++i)
 	{
-		//map<uint32_t, vector<T>> m;
-
 		for (size_t j = 0; j < pst.size(); ++j)
 		{
 			uint32_t hash = hfs[i].hash(pst[j]);
 
 			if (buckets[i].count(hash) == 0)
 			{
-				buckets[i].insert(make_pair(hash, vector<T>{ pst[j] }));
+				buckets[i].insert(make_pair(hash, vector<T*>{ &pst[j] }));
 			}
 			else
 			{
-				buckets[i][hash].push_back(pst[j]);
+				buckets[i][hash].push_back(&pst[j]);
 			}
 		}
-
-		//buckets.push_back(m);
-
 		cout << "Hash tables made: " << count++ << "\n";
 	}
 }
