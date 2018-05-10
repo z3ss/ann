@@ -76,6 +76,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\sparsepp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,11 +125,12 @@
   <ItemGroup>
     <ClCompile Include="bitset_hash.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="sim_hash.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ann.h" />
     <ClInclude Include="bitset_hash.h" />
-    <ClInclude Include="hash_family.h" />
+    <ClInclude Include="sim_hash.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -12,7 +12,7 @@ using namespace std;
 
 #define M 128
 #define K 16
-#define L 20
+#define L 30
 #define N 1000
 
 int dist(bitset<M> a, bitset<M> b)
@@ -63,6 +63,19 @@ int main(int argc, char** argv) {
 	}
 
 	cout << es.size() << " elements loaded\n";
+
+	/*bitset<M> q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
+	int min = -1;
+
+	for (size_t i = 0; i < es.size(); i++)
+	{
+		auto d = dist(q, es[i]);
+		if (min < 0 || d < min)
+		{
+			min = d;
+			cout << es[i].to_string() << " dist: " << d << "\n";
+		}
+	}*/
 
 	auto hfs = create_bitset_hash();
 

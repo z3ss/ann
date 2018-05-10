@@ -1,14 +1,17 @@
 #pragma once
-#include <unordered_map>
 #include <vector>
 #include <functional>
+#include <sparsepp/spp.h>
 
+//#define SPP_USE_SPP_ALLOC 1
+
+using spp::sparse_hash_map;
 using namespace std;
 
 template <class T, class S> class ann {
 	private:
 		vector<S> hfs;
-		vector<unordered_map<uint32_t, vector<T*>>> buckets;
+		vector<sparse_hash_map<uint32_t, vector<T*>>> buckets;
 		function<int(T, T)> dist;
 	public:
 		T query(T elem);
@@ -17,7 +20,7 @@ template <class T, class S> class ann {
 		ann(vector<S>* hash_family, function<int(T, T)> distance, int l) {
 			hfs = *hash_family;
 			dist = distance;
-			buckets = vector<unordered_map<uint32_t, vector<T*>>>(l);
+			buckets = vector<sparse_hash_map<uint32_t, vector<T*>>>(l);
 		}
 };
 
@@ -71,6 +74,7 @@ void ann<T,S>::init(vector<T>* ps)
 				buckets[i][hash].push_back(&pst[j]);
 			}
 		}
+
 		cout << "Hash tables made: " << count++ << "\n";
 	}
 }
