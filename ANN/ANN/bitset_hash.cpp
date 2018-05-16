@@ -1,4 +1,6 @@
 #include "bitset_hash.h"
+#include <bitset>
+#include <iostream>
 
 using namespace std;
 
@@ -7,19 +9,21 @@ bitset_hash::bitset_hash(const vector<int>& bits)
 	this->bits = bits;
 }
 
-
 bitset_hash::~bitset_hash()
 = default;
 
-uint32_t bitset_hash::hash(bitset<128>& elem)
+uint32_t bitset_hash::hash(my_bitset& elem)
 {
 	uint32_t hash = 0;
 
 	for (auto bit : bits)
 	{
-		hash += elem[bit];
+		const auto b = elem.bit(bit);
+		hash += b;
 		hash <<= 1;
 	}
+
+	hash >>= 1;
 
 	return hash;
 }

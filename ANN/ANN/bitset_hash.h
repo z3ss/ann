@@ -1,6 +1,7 @@
 #pragma once
 #include <bitset>
 #include <vector>
+#include "my_bitset.h"
 
 using namespace std;
 
@@ -11,6 +12,6 @@ class bitset_hash
 	public:
 		bitset_hash(const vector<int>& bits);
 		~bitset_hash();
-		uint32_t hash(bitset<128>& elem);
+		uint32_t hash(my_bitset& elem);
 };
 

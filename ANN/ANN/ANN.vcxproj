@@ -125,11 +125,13 @@
   <ItemGroup>
     <ClCompile Include="bitset_hash.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="my_bitset.cpp" />
     <ClCompile Include="sim_hash.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ann.h" />
     <ClInclude Include="bitset_hash.h" />
+    <ClInclude Include="my_bitset.h" />
     <ClInclude Include="sim_hash.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

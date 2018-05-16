@@ -7,15 +7,17 @@
 
 #include "bitset_hash.h"
 #include "ann.h"
+#include "sim_hash.h"
+#include "my_bitset.h"
 
 using namespace std;
 
 #define M 128
 #define K 16
-#define L 30
+#define L 60
 #define N 1000
 
-int dist(bitset<M> a, bitset<M> b)
+int dist(const my_bitset& a, const my_bitset& b)
 {
 	auto dif = a ^ b;
 	return dif.count();
@@ -49,12 +51,46 @@ vector<bitset_hash> create_bitset_hash()
 	return hfs;
 }
 
+vector<sim_hash> create_sim_hash()
+{
+	random_device seeder;
+	//then make a mersenne twister engine
+	mt19937 engine(seeder());
+	//then the easy part... the distribution
+	normal_distribution<float> rand_dist;
+
+	vector<sim_hash> hfs;
+
+	for (size_t i = 0; i < L; i++)
+	{
+		vector<vector<float>> vs;
+		for (int l = 0; l < M; ++l)
+		{
+			vector<float> v;
+
+			for (size_t j = 0; j < K; j++)
+			{
+				const auto d = rand_dist(engine);
+				v.push_back(d);
+			}
+
+			vs.push_back(v);
+		}
+
+		const sim_hash bh(vs);
+
+		hfs.push_back(bh);
+	}
+
+	return hfs;
+}
+
 int main(int argc, char** argv) {
 
 	cout << "loading file... ";
 
 	ifstream infile("nytimes.hamming.128.data");
-	vector<bitset<M>> es;
+	vector<my_bitset> es;
 
 	string line;
 	while (getline(infile, line))
@@ -79,13 +115,13 @@ int main(int argc, char** argv) {
 
 	auto hfs = create_bitset_hash();
 
-	ann<bitset<M>,bitset_hash> alg(&hfs, dist, L);
+	ann<my_bitset,bitset_hash> alg(&hfs, dist, L);
 
 	alg.init(&es);
 
 	cout << "query: 00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011 \n";
 
-	bitset<M> q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
+	const my_bitset q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
 
 	auto res = alg.query(q);
 

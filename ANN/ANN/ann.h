@@ -1,9 +1,10 @@
 #pragma once
 #include <vector>
 #include <functional>
-#include <sparsepp/spp.h>
 
-//#define SPP_USE_SPP_ALLOC 1
+#define SPP_USE_SPP_ALLOC 1
+
+#include <sparsepp/spp.h>
 
 using spp::sparse_hash_map;
 using namespace std;
@@ -34,24 +35,32 @@ T ann<T,S>::query(T elem)
 		uint32_t hash = hfs[i].hash(elem);
 		//vector<T*> nbs = buckets[i][hash];
 
+		cout << buckets[i][hash].size() << " ";
+
 		neighbors.insert(neighbors.end(), buckets[i][hash].begin(), buckets[i][hash].end());
 	}
 
-	T nearest;
+	cout << "\n";
+
+	cout << neighbors.size() << "\n";
+
+	T* nearest = nullptr;
 	auto dis = INT32_MAX;
 
-	for (auto neighbor : neighbors)
+	for (T* neighbor : neighbors)
 	{
-		T n = *neighbor;
-		auto d = dist(n, elem);
+		//T n = *neighbor;
+		auto d = dist(*neighbor, elem);
 		if(d < dis)
 		{
-			nearest = n;
+			nearest = neighbor;
 			dis = d;
 		}
 	}
 
-	return nearest;
+	neighbors.clear();
+
+	return *nearest;
 }
 
 template<class T, class S>
@@ -59,22 +68,28 @@ void ann<T,S>::init(vector<T>* ps)
 {
 	auto count = 1;
 	vector<T>& pst = *ps;
+	
 	for (size_t i = 0; i < hfs.size(); ++i)
 	{
+		auto new_table = 0;
+		auto existing = 0;
 		for (size_t j = 0; j < pst.size(); ++j)
 		{
 			uint32_t hash = hfs[i].hash(pst[j]);
 
-			if (buckets[i].count(hash) == 0)
+			if (!buckets[i].contains(hash))
 			{
+				new_table++;
 				buckets[i].insert(make_pair(hash, vector<T*>{ &pst[j] }));
 			}
 			else
 			{
+				existing++;
 				buckets[i][hash].push_back(&pst[j]);
 			}
 		}
 
+		cout << existing << " " << new_table << "\n";
 		cout << "Hash tables made: " << count++ << "\n";
 	}
 }
