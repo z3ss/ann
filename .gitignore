@@ -335,3 +335,4 @@ __pycache__/
 #files
 *.data
 *.query
+*.25d.txt

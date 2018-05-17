@@ -63,7 +63,7 @@ vector<sim_hash> create_sim_hash()
 
 	for (size_t i = 0; i < L; i++)
 	{
-		vector<vector<float>> vs;
+		vector<vector<float>> vs(K);
 		for (int l = 0; l < M; ++l)
 		{
 			vector<float> v;
@@ -85,49 +85,74 @@ vector<sim_hash> create_sim_hash()
 	return hfs;
 }
 
-int main(int argc, char** argv) {
+//int main(int argc, char** argv) {
+//
+//	cout << "loading file... ";
+//
+//	ifstream infile("nytimes.hamming.128.data");
+//	vector<my_bitset> es;
+//
+//	string line;
+//	while (getline(infile, line))
+//	{
+//		es.emplace_back(line);
+//	}
+//
+//	cout << es.size() << " elements loaded\n";
+//
+//	/*bitset<M> q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
+//	int min = -1;
+//
+//	for (size_t i = 0; i < es.size(); i++)
+//	{
+//		auto d = dist(q, es[i]);
+//		if (min < 0 || d < min)
+//		{
+//			min = d;
+//			cout << es[i].to_string() << " dist: " << d << "\n";
+//		}
+//	}*/
+//
+//	auto hfs = create_bitset_hash();
+//
+//	ann<my_bitset,bitset_hash> alg(&hfs, dist, L);
+//
+//	alg.init(&es);
+//
+//	cout << "query: 00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011 \n";
+//
+//	const my_bitset q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
+//
+//	auto res = alg.query(q);
+//
+//	cout << "found: " << res.to_string() << "\n";
+//
+//	cout << "distance: " << dist(q, res);
+//
+//	return 0;
+//}
 
+int main()
+{
 	cout << "loading file... ";
 
 	ifstream infile("nytimes.hamming.128.data");
-	vector<my_bitset> es;
+	vector<vector<float>> es;
 
+	const string delimiter = " ";
 	string line;
 	while (getline(infile, line))
 	{
-		es.emplace_back(line);
+		vector<float> plane(M);
+		size_t pos = 0;
+		while ((pos = line.find(delimiter) != string::npos))
+		{
+			const string tmp = line.substr(0, pos);
+			plane.push_back(stof(tmp));
+			line.erase(0, pos + delimiter.length());
+		}
+		es.push_back(plane);
 	}
 
 	cout << es.size() << " elements loaded\n";
-
-	/*bitset<M> q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
-	int min = -1;
-
-	for (size_t i = 0; i < es.size(); i++)
-	{
-		auto d = dist(q, es[i]);
-		if (min < 0 || d < min)
-		{
-			min = d;
-			cout << es[i].to_string() << " dist: " << d << "\n";
-		}
-	}*/
-
-	auto hfs = create_bitset_hash();
-
-	ann<my_bitset,bitset_hash> alg(&hfs, dist, L);
-
-	alg.init(&es);
-
-	cout << "query: 00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011 \n";
-
-	const my_bitset q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
-
-	auto res = alg.query(q);
-
-	cout << "found: " << res.to_string() << "\n";
-
-	cout << "distance: " << dist(q, res);
-
-	return 0;
 }
