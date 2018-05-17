@@ -1,9 +1,12 @@
+#define _SCL_SECURE_NO_WARNINGS
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <bitset>
 #include <random>
 #include <vector>
+#include <Eigen/Eigen>
 
 #include "bitset_hash.h"
 #include "ann.h"
@@ -14,13 +17,19 @@ using namespace std;
 
 #define M 128
 #define K 16
-#define L 60
+#define L 20
 #define N 1000
+#define D 25
 
-int dist(const my_bitset& a, const my_bitset& b)
+int dist_b(const my_bitset& a, const my_bitset& b)
 {
 	auto dif = a ^ b;
 	return dif.count();
+}
+
+float dist_v(const Eigen::VectorXf& a, const Eigen::VectorXf& b)
+{
+	return a.dot(b)/(a.norm()*b.norm());
 }
 
 vector<bitset_hash> create_bitset_hash()
@@ -63,18 +72,20 @@ vector<sim_hash> create_sim_hash()
 
 	for (size_t i = 0; i < L; i++)
 	{
-		vector<vector<float>> vs(K);
-		for (int l = 0; l < M; ++l)
+		vector<Eigen::VectorXf> vs;
+		for (int l = 0; l < K; ++l)
 		{
 			vector<float> v;
 
-			for (size_t j = 0; j < K; j++)
+			for (size_t j = 0; j < D; j++)
 			{
 				const auto d = rand_dist(engine);
 				v.push_back(d);
 			}
 
-			vs.push_back(v);
+			vs.emplace_back(Eigen::VectorXf::Map(v.data(), v.size()));
+
+			v.clear();
 		}
 
 		const sim_hash bh(vs);
@@ -136,23 +147,57 @@ int main()
 {
 	cout << "loading file... ";
 
-	ifstream infile("nytimes.hamming.128.data");
-	vector<vector<float>> es;
+	ifstream infile("glove.twitter.27B.25d.txt");
+	vector<Eigen::VectorXf> es;
+	vector<Eigen::VectorXf> qs;
 
-	const string delimiter = " ";
+	const char delimiter = ' ';
 	string line;
-	while (getline(infile, line))
+	int cnt = 0;
+	while (getline(infile, line) && cnt < 10000)
 	{
-		vector<float> plane(M);
+		line.erase(0, line.find(delimiter) + 1);
+			
+		vector<float> plane;
 		size_t pos = 0;
-		while ((pos = line.find(delimiter) != string::npos))
+
+		while ((pos = line.find(delimiter)) != string::npos)
 		{
 			const string tmp = line.substr(0, pos);
 			plane.push_back(stof(tmp));
-			line.erase(0, pos + delimiter.length());
+			line.erase(0, pos + 1);
 		}
-		es.push_back(plane);
+
+		plane.push_back(stof(line));
+
+		if(cnt < 9000)
+		{
+			es.emplace_back(Eigen::VectorXf::Map(plane.data(), plane.size()));
+		}
+		else
+		{
+			qs.emplace_back(Eigen::VectorXf::Map(plane.data(), plane.size()));
+		}
+			
+		plane.clear();
+		cnt++;
 	}
 
+	infile.close();
+
 	cout << es.size() << " elements loaded\n";
+
+	auto hfs = create_sim_hash();
+
+	ann<Eigen::VectorXf,sim_hash,float> alg(&hfs, dist_v, L);
+
+	alg.init(&es);
+	
+	const auto res = alg.query(qs[0]);
+
+	cout << dist_v(qs[0], res) << "\n";
+
+	auto dif = qs[0] - res;
+
+	cout << dif;
 }

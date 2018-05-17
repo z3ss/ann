@@ -1,15 +1,16 @@
 #pragma once
 #include <vector>
+#include <Eigen/StdVector>
 
 using namespace std;
 
 class sim_hash
 {
 	private:
-		vector<vector<float>> hyperplanes;
+		vector<Eigen::VectorXf> hyperplanes;
 	public:
-		sim_hash(const vector<vector<float>>& hyperplanes);
+		sim_hash(const vector<Eigen::VectorXf>& hyperplanes);
 		~sim_hash();
-		uint32_t hash(std::vector<float>& elem);
+		uint32_t hash(Eigen::VectorXf& elem);
 };
 

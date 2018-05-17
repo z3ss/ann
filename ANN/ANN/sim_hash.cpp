@@ -1,9 +1,8 @@
 #include "sim_hash.h"
-#include <numeric>
 
 using namespace std;
 
-sim_hash::sim_hash(const vector<vector<float>>& hyperplanes)
+sim_hash::sim_hash(const vector<Eigen::VectorXf>& hyperplanes)
 {
 	this->hyperplanes = hyperplanes;
 }
@@ -12,13 +11,13 @@ sim_hash::sim_hash(const vector<vector<float>>& hyperplanes)
 sim_hash::~sim_hash()
 = default;
 
-uint32_t sim_hash::hash(vector<float>& elem)
+uint32_t sim_hash::hash(Eigen::VectorXf& elem)
 {
 	uint32_t res = 0;
 
 	for (auto hp : hyperplanes)
 	{
-		const auto ip = inner_product(begin(hp), end(hp), begin(elem), 0.0);
+		const auto ip = hp.dot(elem);
 		if (ip >= 0)
 		{
 			res <<= 1;

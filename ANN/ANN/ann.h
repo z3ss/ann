@@ -9,24 +9,24 @@
 using spp::sparse_hash_map;
 using namespace std;
 
-template <class T, class S> class ann {
+template <class T, class S, class L> class ann {
 	private:
 		vector<S> hfs;
 		vector<sparse_hash_map<uint32_t, vector<T*>>> buckets;
-		function<int(T, T)> dist;
+		function<L(T, T)> dist;
 	public:
 		T query(T elem);
 		void init(vector<T>* ps);
 
-		ann(vector<S>* hash_family, function<int(T, T)> distance, int l) {
+		ann(vector<S>* hash_family, function<L(T, T)> distance, int l) {
 			hfs = *hash_family;
 			dist = distance;
 			buckets = vector<sparse_hash_map<uint32_t, vector<T*>>>(l);
 		}
 };
 
-template<class T, class S>
-T ann<T,S>::query(T elem)
+template<class T, class S, class L>
+T ann<T,S,L>::query(T elem)
 {
 	vector<T*> neighbors;
 
@@ -45,7 +45,7 @@ T ann<T,S>::query(T elem)
 	cout << neighbors.size() << "\n";
 
 	T* nearest = nullptr;
-	auto dis = INT32_MAX;
+	L dis = 100000;
 
 	for (T* neighbor : neighbors)
 	{
@@ -63,8 +63,8 @@ T ann<T,S>::query(T elem)
 	return *nearest;
 }
 
-template<class T, class S>
-void ann<T,S>::init(vector<T>* ps)
+template<class T, class S, class L>
+void ann<T,S,L>::init(vector<T>* ps)
 {
 	auto count = 1;
 	vector<T>& pst = *ps;

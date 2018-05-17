@@ -2,7 +2,7 @@
 #include <string>
 
 using chunk_t = unsigned long;
-const static uint32_t chunk_size = 8 * sizeof(chunk_t);
+const static size_t chunk_size = 8 * sizeof(chunk_t);
 
 class my_bitset
 {
