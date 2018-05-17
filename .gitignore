@@ -336,3 +336,5 @@ __pycache__/
 *.data
 *.query
 *.25d.txt
+
+ANN/eigen
