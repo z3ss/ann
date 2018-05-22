@@ -1,4 +1,5 @@
 #define _SCL_SECURE_NO_WARNINGS
+#define SPP_USE_SPP_ALLOC 1
 
 #include <iostream>
 #include <fstream>
@@ -96,108 +97,108 @@ vector<sim_hash> create_sim_hash()
 	return hfs;
 }
 
-//int main(int argc, char** argv) {
-//
-//	cout << "loading file... ";
-//
-//	ifstream infile("nytimes.hamming.128.data");
-//	vector<my_bitset> es;
-//
-//	string line;
-//	while (getline(infile, line))
-//	{
-//		es.emplace_back(line);
-//	}
-//
-//	cout << es.size() << " elements loaded\n";
-//
-//	/*bitset<M> q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
-//	int min = -1;
-//
-//	for (size_t i = 0; i < es.size(); i++)
-//	{
-//		auto d = dist(q, es[i]);
-//		if (min < 0 || d < min)
-//		{
-//			min = d;
-//			cout << es[i].to_string() << " dist: " << d << "\n";
-//		}
-//	}*/
-//
-//	auto hfs = create_bitset_hash();
-//
-//	ann<my_bitset,bitset_hash> alg(&hfs, dist, L);
-//
-//	alg.init(&es);
-//
-//	cout << "query: 00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011 \n";
-//
-//	const my_bitset q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
-//
-//	auto res = alg.query(q);
-//
-//	cout << "found: " << res.to_string() << "\n";
-//
-//	cout << "distance: " << dist(q, res);
-//
-//	return 0;
-//}
+int main(int argc, char** argv) {
 
-int main()
-{
 	cout << "loading file... ";
 
-	ifstream infile("glove.twitter.27B.25d.txt");
-	vector<Eigen::VectorXf> es;
-	vector<Eigen::VectorXf> qs;
+	ifstream infile("nytimes.hamming.128.data");
+	vector<my_bitset> es;
 
-	const char delimiter = ' ';
 	string line;
-	int cnt = 0;
-	while (getline(infile, line) && cnt < 10000)
+	while (getline(infile, line))
 	{
-		line.erase(0, line.find(delimiter) + 1);
-			
-		vector<float> plane;
-		size_t pos = 0;
-
-		while ((pos = line.find(delimiter)) != string::npos)
-		{
-			const string tmp = line.substr(0, pos);
-			plane.push_back(stof(tmp));
-			line.erase(0, pos + 1);
-		}
-
-		plane.push_back(stof(line));
-
-		if(cnt < 9000)
-		{
-			es.emplace_back(Eigen::VectorXf::Map(plane.data(), plane.size()));
-		}
-		else
-		{
-			qs.emplace_back(Eigen::VectorXf::Map(plane.data(), plane.size()));
-		}
-			
-		plane.clear();
-		cnt++;
+		es.emplace_back(line);
 	}
-
-	infile.close();
 
 	cout << es.size() << " elements loaded\n";
 
-	auto hfs = create_sim_hash();
+	/*bitset<M> q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
+	int min = -1;
 
-	ann<Eigen::VectorXf,sim_hash,float> alg(&hfs, dist_v, L);
+	for (size_t i = 0; i < es.size(); i++)
+	{
+		auto d = dist(q, es[i]);
+		if (min < 0 || d < min)
+		{
+			min = d;
+			cout << es[i].to_string() << " dist: " << d << "\n";
+		}
+	}*/
+
+	auto hfs = create_bitset_hash();
+
+	ann<my_bitset,bitset_hash,int> alg(&hfs, dist_b, L);
 
 	alg.init(&es);
-	
-	const auto res = alg.query(qs[0]);
 
-	cout << dist_v(qs[0], res) << "\n";
+	cout << "query: 00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011 \n";
 
-	auto dif = qs[0] - res;
+	const my_bitset q("00110010001110000101110111011100001110011110011010010010111011101010100101011111100000010100010101111100011111001001111110101011");
 
-	cout << dif;
+	auto res = alg.query(q);
+
+	cout << "found: " << res.to_string() << "\n";
+
+	cout << "distance: " << dist_b(q, res);
+
+	return 0;
 }
+
+//int main()
+//{
+//	cout << "loading file... ";
+//
+//	ifstream infile("glove.twitter.27B.25d.txt");
+//	vector<Eigen::VectorXf> es;
+//	vector<Eigen::VectorXf> qs;
+//
+//	const char delimiter = ' ';
+//	string line;
+//	int cnt = 0;
+//	while (getline(infile, line) && cnt < 10000)
+//	{
+//		line.erase(0, line.find(delimiter) + 1);
+//			
+//		vector<float> plane;
+//		size_t pos = 0;
+//
+//		while ((pos = line.find(delimiter)) != string::npos)
+//		{
+//			const string tmp = line.substr(0, pos);
+//			plane.push_back(stof(tmp));
+//			line.erase(0, pos + 1);
+//		}
+//
+//		plane.push_back(stof(line));
+//
+//		if(cnt < 9000)
+//		{
+//			es.emplace_back(Eigen::VectorXf::Map(plane.data(), plane.size()));
+//		}
+//		else
+//		{
+//			qs.emplace_back(Eigen::VectorXf::Map(plane.data(), plane.size()));
+//		}
+//			
+//		plane.clear();
+//		cnt++;
+//	}
+//
+//	infile.close();
+//
+//	cout << es.size() << " elements loaded\n";
+//
+//	auto hfs = create_sim_hash();
+//
+//	ann<Eigen::VectorXf,sim_hash,float> alg(&hfs, dist_v, L);
+//
+//	alg.init(&es);
+//	
+//	const auto res = alg.query(qs[0]);
+//
+//	cout << dist_v(qs[0], res) << "\n";
+//
+//	const auto dif = qs[0] - res;
+//
+//	cout << dif;
+//}

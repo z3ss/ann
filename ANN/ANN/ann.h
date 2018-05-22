@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <functional>
+#include <forward_list>
 
 #define SPP_USE_SPP_ALLOC 1
 
@@ -12,7 +13,7 @@ using namespace std;
 template <class T, class S, class L> class ann {
 	private:
 		vector<S> hfs;
-		vector<sparse_hash_map<uint32_t, vector<T*>>> buckets;
+		vector<sparse_hash_map<uint32_t, forward_list<T*>>> buckets;
 		function<L(T, T)> dist;
 	public:
 		T query(T elem);
@@ -21,7 +22,7 @@ template <class T, class S, class L> class ann {
 		ann(vector<S>* hash_family, function<L(T, T)> distance, int l) {
 			hfs = *hash_family;
 			dist = distance;
-			buckets = vector<sparse_hash_map<uint32_t, vector<T*>>>(l);
+			buckets = vector<sparse_hash_map<uint32_t, forward_list<T*>>>(l);
 		}
 };
 
@@ -35,7 +36,7 @@ T ann<T,S,L>::query(T elem)
 		uint32_t hash = hfs[i].hash(elem);
 		//vector<T*> nbs = buckets[i][hash];
 
-		cout << buckets[i][hash].size() << " ";
+		//cout << buckets[i][hash].size() << " ";
 
 		neighbors.insert(neighbors.end(), buckets[i][hash].begin(), buckets[i][hash].end());
 	}
@@ -60,6 +61,8 @@ T ann<T,S,L>::query(T elem)
 
 	neighbors.clear();
 
+	if (nearest == nullptr) return  elem;
+
 	return *nearest;
 }
 
@@ -80,13 +83,14 @@ void ann<T,S,L>::init(vector<T>* ps)
 			if (!buckets[i].contains(hash))
 			{
 				new_table++;
-				buckets[i].insert(make_pair(hash, vector<T*>{ &pst[j] }));
+				buckets[i].insert(make_pair(hash, forward_list<T*>{ &pst[j] }));
 			}
 			else
 			{
 				existing++;
-				buckets[i][hash].push_back(&pst[j]);
+				buckets[i][hash].push_front(&pst[j]);
 			}
+
 		}
 
 		cout << existing << " " << new_table << "\n";

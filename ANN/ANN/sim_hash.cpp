@@ -15,17 +15,15 @@ uint32_t sim_hash::hash(Eigen::VectorXf& elem)
 {
 	uint32_t res = 0;
 
-	for (auto hp : hyperplanes)
+	for (const auto& hp : hyperplanes)
 	{
 		const auto ip = hp.dot(elem);
 		if (ip >= 0)
 		{
-			res <<= 1;
+			res++;
 		}
-		else
-		{
-			res <<= 0;
-		}
+
+		res <<= 1;
 	}
 
 	return res;
